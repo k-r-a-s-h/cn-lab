@@ -85,7 +85,7 @@ int main() {
 	int clientfd = accept(sockfd, (SA*)&client, &client_len);
 	if(clientfd < 0) ERROR_CLOSE(sockfd);
 	else printf("Client connected.\n");
-	//change he code here
+	//change the code here
 
 	char str1[100]="enter the number";
 	int arr[100];
