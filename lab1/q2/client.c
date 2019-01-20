@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define PORT 1311
+#define PORT 8585
 #define BUFF_SIZE 100
 
 typedef struct sockaddr SA;
@@ -45,15 +45,38 @@ int main() {
 	if(connect_status < 0) ERROR();
 	else printf("Connected to server.\n");
 
-	printf("Enter your message:\n");
-	scanf("%s", buffer);
-
-	int send_status = send(sockfd, buffer, sizeof(buffer), 0);
+	int num;
+	printf("Enter the size of array:\n");
+	scanf("%d", &num);
+	
+	int send_status = send(sockfd, &num, sizeof(num), 0);
 	if(send_status < 0) ERROR_CLOSE(sockfd);
+	int i=0;
+	int lol=0;
+	for (i=0;i<num;i++){
+		printf("enter the number ");
+		scanf("%d",&lol);
 
-	int recv_status = recv(sockfd, buffer, sizeof(buffer), 0);
-	if(recv_status < 0) ERROR_CLOSE(sockfd);
-	else printf("Recieved: %s\n", buffer);
+		int send_status = send(sockfd, &lol, sizeof(lol), 0);
+		if(send_status < 0) ERROR_CLOSE(sockfd);
+	}
+	printf("enter the number to be searched in the araay ");
+	scanf("%d",&lol);
+
+	send_status=send(sockfd,&lol,sizeof(lol),0);
+	if(send_status<0) ERROR_CLOSE(sockfd);
+
+	int flag;
+	int recv_status=recv(sockfd,&flag,sizeof(flag),0);
+	if(recv_status<0) ERROR_CLOSE(sockfd);
+
+	if(flag==-1){
+		printf("\nElement Not found");
+	}
+	else{
+		printf("\nElemen found at %d",flag);
+	}
+
 
 	close(sockfd);
 	return 0;

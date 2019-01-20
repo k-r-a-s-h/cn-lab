@@ -8,47 +8,36 @@
 #include <time.h> 
 
 
-#define PORT 1311
+#define PORT 8585
 #define BUFF_SIZE 100
 
 typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
 typedef socklen_t LEN;
 
-void delay(int number_of_seconds)
-{
-    // Converting time into milli_seconds
-    int milli_seconds = 1000 * number_of_seconds;
+int binarySearch(int arr[], int l, int r, int x) 
+{ 
+    if (r >= l) { 
+        int mid = l + (r - l) / 2; 
   
-    // Stroing start time
-    clock_t start_time = clock();
+        // If the element is present at the middle 
+        // itself 
+        if (arr[mid] == x) 
+            return mid; 
   
-    // looping till required time is not acheived
-    while (clock() < start_time + milli_seconds)
-        ;
-} 
-
-int binarySearch(int arr[], int l, int r, int x)
-{
-    while (l <= r) {
-        int m = l + (r - l) / 2;
+        // If element is smaller than mid, then 
+        // it can only be present in left subarray 
+        if (arr[mid] > x) 
+            return binarySearch(arr, l, mid - 1, x); 
   
-        // Check if x is present at mid
-        if (arr[m] == x)
-            return m;
+        // Else the element can only be present 
+        // in right subarray 
+        return binarySearch(arr, mid + 1, r, x); 
+    } 
   
-        // If x greater, ignore left half
-        if (arr[m] < x)
-            l = m + 1;
-  
-        // If x is smaller, ignore right half
-        else
-            r = m - 1;
-    }
-  
-    // if we reach here, then element was
-    // not present
-    return -1;
+    // We reach here when element is not 
+    // present in array 
+    return -1; 
 } 
 
 void init_SA(SA_IN *obj, int family, int port, int address) {
@@ -72,10 +61,13 @@ int main() {
 	char buffer[BUFF_SIZE];
 	char buffer1[BUFF_SIZE];
 
+	//creating a socket
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0) ERROR();
 	else printf("Socket created.\n");
-
+	//What is going on here?
+	//sa stands for sockaddr
+	//sa_in sockadddress_in
 	SA_IN server;
 	init_SA(&server, AF_INET, htons(PORT), htonl(INADDR_ANY));
 
@@ -93,40 +85,45 @@ int main() {
 	int clientfd = accept(sockfd, (SA*)&client, &client_len);
 	if(clientfd < 0) ERROR_CLOSE(sockfd);
 	else printf("Client connected.\n");
+	//change he code here
 
 	char str1[100]="enter the number";
 	int arr[100];
+	int num;
 
-	int recv_status = recv(clientfd, buffer, sizeof(buffer), 0);
-		if(recv_status < 0) ERROR_CLOSE(sockfd);\
-		else printf("Recieved: %s\n", buffer);
+		int recv_status = recv(clientfd, &num, sizeof(num), 0);
+		if(recv_status < 0) ERROR_CLOSE(sockfd);
+		else printf("Recieved: %d\n", num);
 
-		int a=buffer[0]-'0';
+
+
 		int i=0;
-		for(i=0;i<a;i++){
-			int send_status = send(clientfd, str1, sizeof(str1), 0);
-			if(send_status < 0) ERROR_CLOSE(sockfd);
-
-			delay(10); 
-			
-			int recv_status = recv(clientfd, buffer, sizeof(buffer), 0);
-			if(recv_status < 0) ERROR_CLOSE(sockfd);\
-			else printf("Recieved: %s\n", buffer);
-			arr[i]=buffer[0]-'0';
-
+		int lol;
+		for(i=0;i<num;i++){
+			int recv_status = recv(clientfd, &lol, sizeof(lol), 0);
+			if(recv_status < 0) ERROR_CLOSE(sockfd);
+			else printf("Recieved: %d\n", lol);
+			arr[i]=lol;	    	
 		}
 
+		recv_status=recv(clientfd,&lol,sizeof(lol),0);
+		if(recv_status<0) ERROR_CLOSE(sockfd);
+		else printf("Received: %d\n",lol);
 
-		int n = sizeof(arr) / sizeof(arr[0]); 
-		int x = 12;
+
+		int n = num; 
+		int x = lol;
     	int result = binarySearch(arr, 0, n - 1, x);
-    	(result == -1) ? printf("Element is not present"
-                            " in array")
-                   : printf("Element is present at "
-                            "index %d",
-                            result); 
 
-	close(sockfd);
-	return 0;
+
+    	(result == -1) ? printf("Element is not present in array"): printf("Element is present at index %d",result); 
+
+		int send_status=send(clientfd,&result,sizeof(result),0);
+		if(send_status<0) ERROR_CLOSE(sockfd);
+
+
+		close(sockfd);
+
+		return 0;
 }
 
