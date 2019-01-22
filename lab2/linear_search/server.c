@@ -5,41 +5,26 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h> 
 
-#define PORT 1311
+
+#define PORT 8585
 #define BUFF_SIZE 100
-
-char *strrev(char *str)
-{
-      char *p1, *p2;
-
-      if (! str || ! *str)
-            return str;
-      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
-      {
-            *p1 ^= *p2;
-            *p2 ^= *p1;
-            *p1 ^= *p2;
-      }
-      return str;
-}
 
 typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
 typedef socklen_t LEN;
 
-int palin(char * a ){
-	  char  b[100];
-	  strcpy(b, a);  /
-	  strrev(b);  
-	 
-	  if (strcmp(a, b) == 0)  {
-		return 1;
+int linearSearch(int arr[],int num ,int size){
+	int i=0;
+	for(i=0;i<size;i++){
+		if(arr[i]==num){
+			return i;
+		}
 	}
-	  else{
-	 	return 0;
-	 }
+	return -1;
 }
+
 
 void init_SA(SA_IN *obj, int family, int port, int address) {
 	obj->sin_family = family;
@@ -60,11 +45,15 @@ void ERROR_CLOSE(int sockfd) {
 
 int main() {
 	char buffer[BUFF_SIZE];
+	char buffer1[BUFF_SIZE];
 
+	//creating a socket
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0) ERROR();
 	else printf("Socket created.\n");
-
+	//What is going on here?
+	//sa stands for sockaddr
+	//sa_in sockadddress_in
 	SA_IN server;
 	init_SA(&server, AF_INET, htons(PORT), htonl(INADDR_ANY));
 
@@ -82,41 +71,45 @@ int main() {
 	int clientfd = accept(sockfd, (SA*)&client, &client_len);
 	if(clientfd < 0) ERROR_CLOSE(sockfd);
 	else printf("Client connected.\n");
+	//change the code here
+
+	char str1[100]="enter the number";
+	int arr[100];
+	int num;
+
+		int recv_status = recv(clientfd, &num, sizeof(num), 0);
+		if(recv_status < 0) ERROR_CLOSE(sockfd);
+		else printf("Recieved: %d\n", num);
 
 
-	
 
-	while(1){
-
-
-	int recv_status = recv(clientfd, buffer, sizeof(buffer), 0);
-
-	char str1[100]="palindrome";
-	char str2[100]="not palindrome";
-
-	if(recv_status < 0) ERROR_CLOSE(sockfd);
-	else {
-		printf("Recieved: %s\n", buffer);
-		int k=palin(buffer);
-		if(k==1){
-			//send ++
-					int send_status = send(clientfd, str1, sizeof(str1), 0);
-						if(send_status < 0) ERROR_CLOSE(sockfd);
-
-
+		int i=0;
+		int lol;
+		for(i=0;i<num;i++){
+			int recv_status = recv(clientfd, &lol, sizeof(lol), 0);
+			if(recv_status < 0) ERROR_CLOSE(sockfd);
+			else printf("Recieved: %d\n", lol);
+			arr[i]=lol;	    	
 		}
-		else{
-			//send --
-					int send_status = send(clientfd, str2, sizeof(str2), 0);
-						if(send_status < 0) ERROR_CLOSE(sockfd);
+
+		recv_status=recv(clientfd,&lol,sizeof(lol),0);
+		if(recv_status<0) ERROR_CLOSE(sockfd);
+		else printf("Received: %d\n",lol);
 
 
-		}
-	}
-}
-	
+		int n = num; 
+		int x = lol;
+    	int result = linearSearch(arr,x,num);
 
-	close(sockfd);
-	return 0;
+
+    	(result == -1) ? printf("Element is not present in array"): printf("Element is present at index %d",result); 
+
+		int send_status=send(clientfd,&result,sizeof(result),0);
+		if(send_status<0) ERROR_CLOSE(sockfd);
+
+
+		close(sockfd);
+
+		return 0;
 }
 

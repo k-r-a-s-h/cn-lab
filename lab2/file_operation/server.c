@@ -9,37 +9,9 @@
 #define PORT 1311
 #define BUFF_SIZE 100
 
-char *strrev(char *str)
-{
-      char *p1, *p2;
-
-      if (! str || ! *str)
-            return str;
-      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
-      {
-            *p1 ^= *p2;
-            *p2 ^= *p1;
-            *p1 ^= *p2;
-      }
-      return str;
-}
-
 typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
 typedef socklen_t LEN;
-
-int palin(char * a ){
-	  char  b[100];
-	  strcpy(b, a);  /
-	  strrev(b);  
-	 
-	  if (strcmp(a, b) == 0)  {
-		return 1;
-	}
-	  else{
-	 	return 0;
-	 }
-}
 
 void init_SA(SA_IN *obj, int family, int port, int address) {
 	obj->sin_family = family;
@@ -84,37 +56,21 @@ int main() {
 	else printf("Client connected.\n");
 
 
-	
-
-	while(1){
-
+	//change here
 
 	int recv_status = recv(clientfd, buffer, sizeof(buffer), 0);
+	if(recv_status < 0) ERROR_CLOSE(sockfd);\
+	else printf("Recieved: %s\n", buffer);
 
-	char str1[100]="palindrome";
-	char str2[100]="not palindrome";
+	FILE *filePointer;
+	filePointer=fopen("server.txt","a");
+	fprintf("tmkc");
+	fclose(filePointer); 
+	// printf("Enter your message:\n");
+	// scanf("%s", buffer);
 
-	if(recv_status < 0) ERROR_CLOSE(sockfd);
-	else {
-		printf("Recieved: %s\n", buffer);
-		int k=palin(buffer);
-		if(k==1){
-			//send ++
-					int send_status = send(clientfd, str1, sizeof(str1), 0);
-						if(send_status < 0) ERROR_CLOSE(sockfd);
-
-
-		}
-		else{
-			//send --
-					int send_status = send(clientfd, str2, sizeof(str2), 0);
-						if(send_status < 0) ERROR_CLOSE(sockfd);
-
-
-		}
-	}
-}
-	
+	// int send_status = send(clientfd, buffer, sizeof(buffer), 0);
+	// if(send_status < 0) ERROR_CLOSE(sockfd);
 
 	close(sockfd);
 	return 0;

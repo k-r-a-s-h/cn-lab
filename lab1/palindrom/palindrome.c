@@ -20,10 +20,10 @@ char *strrev(char *str){
 
 int palin(char * a ){
 	  char  b[100];
-	  strcpy(b, a);  // Copying input string
-	  strrev(b);  // Reversing the string
+	  strcpy(b, a); 
+	  strrev(b);  
 	 
-	  if (strcmp(a, b) == 0)  {// Comparing input string with the reverse string
+	  if (strcmp(a, b) == 0)  {
 		return 1;
 	}
 	  else{
