@@ -12,6 +12,13 @@
 typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
 typedef socklen_t LEN;
+void printArray(char arr[], int size) 
+{ 
+	int i; 
+	for (i=0; i < size; i++) 
+		printf("%s", &arr[i]); 
+	printf("\n"); 
+} 
 
 void init_SA(SA_IN *obj, int family, int port, int address) {
 	obj->sin_family = family;
@@ -46,14 +53,57 @@ int main() {
 	else printf("Connected to server.\n");
 
 
-//change here
+	//change here
 	printf("Enter the file to open:\n");
 	scanf("%s", buffer);
-	
 	int send_status = send(sockfd, buffer, sizeof(buffer), 0);
 	if(send_status < 0) ERROR_CLOSE(sockfd);
 
+	int flag;
+	int recv_status=recv(sockfd,&flag,sizeof(flag),0);
+	if(recv_status<0) ERROR_CLOSE(sockfd);
+
+	if(flag ==1){
+
+		while(1){
+			int lol;
+			printf("\n1)Write File\n2)Read File\n3)Update");
+			scanf("%d",&lol);
+
+			send_status=send(sockfd,&lol,sizeof(lol),0);
+			if(send_status<0) ERROR_CLOSE(sockfd);
+
+
+			switch(lol){
+				case 1: //write code
+						;
+						char buf1[BUFF_SIZE];
+						printf("enter the content to be written");
+						scanf("%s",buf1);
+						send_status=send(sockfd,buf1,sizeof(buf1),0);
+						if(send_status<0) ERROR_CLOSE(sockfd);
+						break;
+				case 2: //read code
+						;
+						char buf2[BUFF_SIZE];
+						recv_status=recv(sockfd,buf2,sizeof(buf2),0);
+						if(recv_status<0) ERROR_CLOSE(sockfd);
+						printArray(buf2,sizeof(buf2));
+						break;
+
+				case 3: //update code
+
+						break;
+			}
+		}
+	}
+	else {
+		printf("file doesnot exsist");
+	}
+
 	
+	
+
 
 	// int recv_status = recv(sockfd, buffer, sizeof(buffer), 0);
 	// if(recv_status < 0) ERROR_CLOSE(sockfd);
