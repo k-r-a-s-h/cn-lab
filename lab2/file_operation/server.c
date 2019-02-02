@@ -59,14 +59,14 @@ int main() {
 
 	//change here
 
-	int recv_status = recv(clientfd, buffer, sizeof(buffer), 0);
+	int recv_status = recv(clientfd, buffer, sizeof(buffer), 0);//file name stored in buffer
 	if(recv_status < 0) ERROR_CLOSE(sockfd);\
 	else printf("Recieved: %s\n", buffer);
 
 	//enter the checking if file exisist code
 
 	char dataToBeWritten[BUFF_SIZE]  ; 
-	FILE *filePointer=fopen(buffer,"w");
+	FILE *filePointer=fopen(buffer,"r");
 	if ( filePointer == NULL )
     {	
     	int send34 =0;
@@ -84,9 +84,9 @@ int main() {
     	if(send_status<0) ERROR_CLOSE(sockfd); 
     	fclose(filePointer);
 
+		int flag=1;
 
-
-    	while (1){
+    	while (flag==1){
     		recv_status = recv(clientfd, &what, sizeof(what), 0);
 			if(recv_status <= 0) ERROR_CLOSE(sockfd);
 
@@ -101,6 +101,7 @@ int main() {
 						// writing in the file using fputs()
 	            		fputs(dataToBeWritten12, filePointer1) ;   
 	            		fputs("\n", filePointer1) ;
+						memset(dataToBeWritten12 , 0, sizeof dataToBeWritten12);
 	            		fclose(filePointer1);
 
 	            		break;
@@ -108,19 +109,49 @@ int main() {
 	           			;
 	           			
 						FILE *filePointer2=fopen(buffer,"r");
-						char buffer_send[BUFF_SIZE];
+						char buffer_send[100];
+						int index=0;
 						char file_buff[100];
-						while(fgets(file_buff,255,(FILE*)filePointer2)){
-							strcat(buffer_send,file_buff);
+
+						//read code here 
+						// while(fgets(file_buff,100,(FILE*)filePointer2)){ //tis is wrong
+						// 	strcat(buffer_send,file_buff);
+						// }
+						char ch;
+						while((ch = fgetc(filePointer2)) != EOF){
+							/* code */
+							printf("%c",ch);
+							buffer_send[index] = (char) ch;
+							index++;
 						}
+						
+						buffer_send[index]='\0';
+
+						printf("%s",buffer_send);
 						int snd_status =send(clientfd,buffer_send,sizeof(buffer_send),0);
 						if(snd_status<0)ERROR_CLOSE(sockfd);
-
+						
 						fclose(filePointer2);
+									
 	           			break;
 	           	case 3://update code
+				   	;
+						FILE *filePointer3 =fopen(buffer,"a");
+						char dataToBeWritten13[BUFF_SIZE]  ;
+						recv_status = recv(clientfd, dataToBeWritten13, sizeof(dataToBeWritten13), 0);
+						if(recv_status < 0) ERROR_CLOSE(sockfd);\
+						else printf("Recieved: %s\n", dataToBeWritten13);
+						fputs(dataToBeWritten13, filePointer3) ;   
+	            		fputs("\n", filePointer3) ;
+						memset(dataToBeWritten12 , 0, sizeof dataToBeWritten13);
+	            		fclose(filePointer3);
+
 
 	           			break;
+				case 4: 
+						;
+
+						flag=0;
 	    		
 	    	}
     }
