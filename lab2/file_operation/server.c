@@ -48,7 +48,7 @@ int main() {
 	int listen_status = listen(sockfd, 1);
 	if(listen_status < 0) ERROR_CLOSE(sockfd);
 	else printf("Socket listening.\n");
-
+   
 	SA_IN client;
 	int client_len = sizeof(client);
 
@@ -121,8 +121,12 @@ int main() {
 						while((ch = fgetc(filePointer2)) != EOF){
 							/* code */
 							printf("%c",ch);
-							buffer_send[index] = (char) ch;
-							index++;
+							
+							if((ch >='a' && ch <='z') || (ch>='A' && ch<='Z') ){
+								buffer_send[index] = (char) ch;
+								index++;
+							}
+							
 						}
 						
 						buffer_send[index]='\0';
