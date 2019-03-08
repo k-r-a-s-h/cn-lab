@@ -30,7 +30,7 @@ typedef socklen_t LEN;
 
 int palin(char * a ){
 	  char  b[100];
-	  strcpy(b, a);  /
+	  strcpy(b, a);  
 	  strrev(b);  
 	 
 	  if (strcmp(a, b) == 0)  {
