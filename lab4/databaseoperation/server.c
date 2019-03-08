@@ -219,18 +219,15 @@ int main(){
                         if(send_status<0)ERROR_CLOSE(sockfd1); 
                         break;
                     }
-                    else
-                    {
-                        char lol[]="Does not exsist";
-                        strcat(send_buffer,lol);
-                        int send_status=send(clientfd1,send_buffer,sizeof(send_buffer),0);
-                        if(send_status<0) ERROR_CLOSE(sockfd1);
-                        int pid=getpid();
-                        send_status=send(clientfd1,&pid,sizeof(int),0);
-                        if(send_status<0)ERROR_CLOSE(sockfd1);
-                    }
                     
                 }
+                char lol[]="Does not exsist";
+                strcat(send_buffer,lol);
+                int send_status=send(clientfd1,send_buffer,sizeof(send_buffer),0);
+                if(send_status<0) ERROR_CLOSE(sockfd1);
+                int pid=getpid();
+                send_status=send(clientfd1,&pid,sizeof(int),0);
+                if(send_status<0)ERROR_CLOSE(sockfd1);
                 close(sockfd1);
                 exit(0);
             }
