@@ -68,8 +68,10 @@ int main(){
 
     SA_IN clientaddr,serveraddr;
     init_SA(&serveraddr,AF_INET,htons(PORT),htonl(INADDR_ANY));
+		init_SA(&clientaddr,AF_INET,htons(PORT+1),htonl(INADDR_ANY));
 
-    int bind_status = bind(sockfd,(const SA*)&serveraddr,sizeof(serveraddr));
+
+    int bind_status = bind(sockfd,(const SA*)&clientaddr,sizeof(clientaddr));
     if(bind_status<0) ERROR_CLOSE(sockfd);
     else
     {
@@ -80,7 +82,7 @@ int main(){
     while(1){
 
 
-	int recv_status = recvfrom(sockfd,buffer, sizeof(buffer), 0,(SA*)&clientaddr,&len);
+	int recv_status = recvfrom(sockfd,buffer, sizeof(buffer), 0,(SA*)&serveraddr,&len);
 
 	char str1[100]="palindrome";
 	char str2[100]="not palindrome";
@@ -91,14 +93,14 @@ int main(){
 		int k=palin(buffer);
 		if(k==1){
 			//send ++
-					int send_status = sendto(sockfd, (const char*)str1, sizeof(str1), 0,(const SA*)&clientaddr,len);
+					int send_status = sendto(sockfd, (const char*)str1, sizeof(str1), 0,(const SA*)&serveraddr,len);
 						if(send_status < 0) ERROR_CLOSE(sockfd);
 
 
 		}
 		else{
 			//send --
-					int send_status = sendto(sockfd, (const char*)str2, sizeof(str2), 0,(const SA*)&clientaddr,len);
+					int send_status = sendto(sockfd, (const char*)str2, sizeof(str2), 0,(const SA*)&serveraddr,len);
 						if(send_status < 0) ERROR_CLOSE(sockfd);
 
 

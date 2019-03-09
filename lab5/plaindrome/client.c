@@ -35,20 +35,28 @@ int main(){
 	if(sockfd<0) ERROR();
 	else printf("socket created");
 
-	SA_IN server;
+	SA_IN server,client;
 	init_SA(&server,AF_INET,htons(PORT),inet_addr("127.0.0.1"));
+	init_SA(&client,AF_INET,htons(PORT+1),inet_addr("127.0.0.1"));
+	
+	int bind_status = bind(sockfd,(const SA*)&server,sizeof(server));
+    if(bind_status<0) ERROR_CLOSE(sockfd);
+    else
+    {
+        printf("bind completed\n");
+    }
     int len;
 
 	while(1){
 		printf("Enter your message:\n");
 		scanf("%s", buffer);
 
-		int send_status = sendto(sockfd, buffer, sizeof(buffer), 0,(const SA*)&server,sizeof(server));
+		int send_status = sendto(sockfd, buffer, sizeof(buffer), 0,(const SA*)&client,sizeof(client));
 		if(send_status < 0) ERROR_CLOSE(sockfd);
 	
 
 		char buffer_send[BUFF_SIZE];
-		int recv_status = recvfrom(sockfd,(char*) buffer_send, sizeof(buffer_send), 0,(SA*)&server,&len);
+		int recv_status = recvfrom(sockfd,(char*) buffer_send, sizeof(buffer_send), 0,(SA*)&client,&len);
 		if(recv_status < 0) ERROR_CLOSE(sockfd);
 		else printf("Recieved: %s\n", buffer_send);
 	}
