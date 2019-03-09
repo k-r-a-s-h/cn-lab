@@ -35,19 +35,27 @@ int main(){
 	if(sockfd<0) ERROR();
 	else printf("socket created");
 
-	SA_IN server;
+	SA_IN server,client;
 	init_SA(&server,AF_INET,htons(PORT),inet_addr("127.0.0.1"));
+    init_SA(&client,AF_INET,htons(PORT+1),inet_addr("127.0.0.1"));
+	
+	int bind_status = bind(sockfd,(const SA*)&server,sizeof(server));
+    if(bind_status<0) ERROR_CLOSE(sockfd);
+    else
+    {
+        printf("bind completed\n");
+    }
     //change here
 
 	int len;
     printf("Enter the file to open:\n");
 	scanf("%s", buffer);
-    int send_status=sendto(sockfd,buffer,sizeof(buffer),0,(const SA*)&server,sizeof(server));
+    int send_status=sendto(sockfd,buffer,sizeof(buffer),0,(const SA*)&client,sizeof(client));
     if(send_status<0) ERROR_CLOSE(sockfd);
 
     int flag,tap;
     tap=1;
-    int recv_status=recvfrom(sockfd,&flag,sizeof(flag),0,(SA*)&server,&len);
+    int recv_status=recvfrom(sockfd,&flag,sizeof(flag),0,(SA*)&client,&len);
     if(recv_status<0) ERROR_CLOSE(sockfd);
 
     if(flag==1){
@@ -56,7 +64,7 @@ int main(){
             printf("\n1)Write File\n2)Read File\n3)Update\n4)Exit");
 			scanf("%d",&lol);
 
-            send_status=sendto(sockfd,&lol,sizeof(lol),0,(const SA*)&server,sizeof(server));
+            send_status=sendto(sockfd,&lol,sizeof(lol),0,(const SA*)&client,sizeof(client));
             if(send_status<0)ERROR_CLOSE(sockfd);
 
             switch (lol)
@@ -68,13 +76,13 @@ int main(){
                         printf("enter the content to be writeen \n");
                         scanf("%s",buf1);
 
-                        send_status=sendto(sockfd,buf1,sizeof(buf1),0,(const SA*)&server,sizeof(server));
+                        send_status=sendto(sockfd,buf1,sizeof(buf1),0,(const SA*)&client,sizeof(client));
                         if(send_status<0) ERROR_CLOSE(sockfd);
                     break;
                 case 2:
                         ;
                         char buf2[BUFF_SIZE];
-                        recv_status=recvfrom(sockfd,buf2,sizeof(buf2),0,(SA*)&server,&len);
+                        recv_status=recvfrom(sockfd,buf2,sizeof(buf2),0,(SA*)&client,&len);
                         if(recv_status<0) ERROR_CLOSE(sockfd);
                         printf("%s",buf2);
                         break;
@@ -83,7 +91,7 @@ int main(){
 						char buf3[BUFF_SIZE];
 						printf("enter the content to be written");
 						scanf("%s",buf3);
-                        send_status=sendto(sockfd,buf3,sizeof(buf3),0,(const SA*)&server,sizeof(server));
+                        send_status=sendto(sockfd,buf3,sizeof(buf3),0,(const SA*)&client,sizeof(client));
                         if(send_status<0) ERROR_CLOSE(sockfd);
                         break;
                 case 4: 
