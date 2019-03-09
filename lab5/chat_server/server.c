@@ -40,8 +40,8 @@ int main(){
 
     SA_IN clientaddr,serveraddr;
     init_SA(&serveraddr,AF_INET,htons(PORT),htonl(INADDR_ANY));
-
-    int bind_status = bind(sockfd,(const SA*)&serveraddr,sizeof(serveraddr));
+    init_SA(&clientaddr,AF_INET,htons(PORT+1),htonl(INADDR_ANY));
+    int bind_status = bind(sockfd,(const SA*)&clientaddr,sizeof(clientaddr));
     if(bind_status<0) ERROR_CLOSE(sockfd);
     else
     {
@@ -62,7 +62,7 @@ int main(){
     int pid=fork();
     if(pid > 0){
         while(1){
-            int recv_status=recvfrom(sockfd,buffer1,sizeof(buffer1),0,(SA*)&clientaddr,&len);
+            int recv_status=recvfrom(sockfd,buffer1,sizeof(buffer1),0,(SA*)&serveraddr,&len);
             if(recv_status<0)ERROR_CLOSE(sockfd);
             else{
                 printf("Client: %s \n",buffer1);
@@ -74,12 +74,12 @@ int main(){
         
         while(1){
             scanf("%s",buffer2);
-            int send_status=sendto(sockfd,(const char*)buffer2,sizeof(buffer2),0,(const SA*)&clientaddr,len);
+            int send_status=sendto(sockfd,(const char*)buffer2,sizeof(buffer2),0,(const SA*)&serveraddr,len);
             //hre we have th error.
-                    printf("Child process1");    
+                    // printf("Child process1");    
 
             if(send_status<0) ERROR_CLOSE(sockfd);
-                    printf("Child process2");    
+                    // printf("Child process2");    
 
             memset(buffer2,0,sizeof(buffer2));
         }

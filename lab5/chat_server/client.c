@@ -36,15 +36,22 @@ int main(){
 	if(sockfd<0) ERROR();
 	else printf("socket created\n");
 
-	SA_IN server;
+	SA_IN server,client;
 	init_SA(&server,AF_INET,htons(PORT),inet_addr("127.0.0.1"));
-
+	init_SA(&client,AF_INET,htons(PORT+1),inet_addr("127.0.0.1"));
+	
+	int bind_status = bind(sockfd,(const SA*)&server,sizeof(server));
+    if(bind_status<0) ERROR_CLOSE(sockfd);
+    else
+    {
+        printf("bind completed\n");
+    }
 	int len;
     int pid=fork();
     if(pid > 0){
         while(1){
             scanf("%s",buffer1);
-            int send_status=sendto(sockfd,(const char*)buffer1,sizeof(buffer1),0,(const SA*)&server,sizeof(server));
+            int send_status=sendto(sockfd,(const char*)buffer1,sizeof(buffer1),0,(const SA*)&client,sizeof(client));
             if(send_status<0) ERROR_CLOSE(sockfd);
             memset(buffer1,0,sizeof(buffer1));
         }
@@ -52,10 +59,10 @@ int main(){
     }
     else if(pid == 0){
         while(1){
-            int recv_status=recvfrom(sockfd,buffer2,sizeof(buffer2),0,(SA*)&server,&len);
+            int recv_status=recvfrom(sockfd,buffer2,sizeof(buffer2),0,(SA*)&client,&len);
             if(recv_status < 0) ERROR_CLOSE(sockfd);
 			else {
-				printf(" server : %s  \n",buffer2);
+				printf("server : %s  \n",buffer2);
 			}
 			memset(buffer2,0,sizeof(buffer2));
         }
