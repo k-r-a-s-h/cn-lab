@@ -79,8 +79,9 @@ int main(){
 
     SA_IN clientaddr,serveraddr;
     init_SA(&serveraddr,AF_INET,htons(PORT),htonl(INADDR_ANY));
+    init_SA(&clientaddr,AF_INET,htons(PORT+1),htonl(INADDR_ANY));
 
-    int bind_status = bind(sockfd,(const SA*)&serveraddr,sizeof(serveraddr));
+    int bind_status = bind(sockfd,(const SA*)&clientaddr,sizeof(clientaddr));
     if(bind_status<0) ERROR_CLOSE(sockfd);
     else
     {
@@ -88,7 +89,7 @@ int main(){
     }
     int len=sizeof(clientaddr);
     //change here
-    int recv_status=recvfrom(sockfd,buffer,sizeof(buffer),0,(SA*)&clientaddr,&len);
+    int recv_status=recvfrom(sockfd,buffer,sizeof(buffer),0,(SA*)&serveraddr,&len);
     if(recv_status<0){
         printf("%d",recv_status);
         ERROR_CLOSE(sockfd);
@@ -109,13 +110,13 @@ int main(){
             int val= dig_1*10 + dig_2;
             if(s1.r_number==val){
                 strcat(buffer_send,s1.name);
-                int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&clientaddr,len);
+                int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&serveraddr,len);
                 if(send_status<0) ERROR_CLOSE(sockfd);
             }
             else{
                 char lol[]="Does not exsist";
                 strcat(buffer_send,lol);
-                int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&clientaddr,len);
+                int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&serveraddr,len);
                 if(send_status<0) ERROR_CLOSE(sockfd);
             }
              close(sockfd);
@@ -137,21 +138,21 @@ int main(){
                     index++;
                 }
                 name[index]='\0';
-                printf("%s",name);
-                printf("%s",s1.name);
+               // printf("%s",name);
+                //printf("%s",s1.name);
 
                 if(!strcmp(name,s1.name)){
                     char str[2];
                     str[0]=s1.section;
                     str[1]='\0';
                     strcat(buffer_send,str);
-                    int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&clientaddr,len);
+                    int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&serveraddr,len);
                     if(send_status<0) ERROR_CLOSE(sockfd);
                 }
                 else{
                     char lol[]="Does not exsist";
                     strcat(buffer_send,lol);
-                    int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&clientaddr,len);
+                    int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&serveraddr,len);
                     if(send_status<0) ERROR_CLOSE(sockfd);
 
                 }
@@ -179,7 +180,7 @@ int main(){
                         buffer_send[0]=dig__1+'0';
                         buffer_send[1]=dig__2+'0';
                         buffer_send[2]='\0';
-                        int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&clientaddr,len);
+                        int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&serveraddr,len);
                         if(send_status<0) ERROR_CLOSE(sockfd);
                         close(sockfd);
                         exit(0);
@@ -188,7 +189,7 @@ int main(){
                 }
                 char lol[]="Does Not exsist";
                 strcat(buffer_send,lol);
-                int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&clientaddr,len);
+                int send_status=sendto(sockfd,(const char*)buffer_send,strlen(buffer_send),0,(const SA*)&serveraddr,len);
                 if(send_status<0) ERROR_CLOSE(sockfd);
                 close(sockfd);
                 exit(0);
